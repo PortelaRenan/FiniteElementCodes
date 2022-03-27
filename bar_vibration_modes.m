@@ -1,104 +1,89 @@
-%% Program: Torção
+%% Program: Torsion
 %
-%   @DESCRIÇÃO Atividade 3: Definir o modo de vibração de uma barra
-%   livre-livre e engastada
-%
-%   @AUTOR Renan Miranda Portela @
-%
-%% Limpar memória e fechar janelas
+%   @DESCRIPTION: Define the different vibration modes of a free-free or free-clamped bar
+%   @AUTHOR: Renan Miranda Portela
+%   
+%% Clen memory and close all windows open
 clear all
 close all
 clc
 
-%% Matriz de Coordenadas do sistema 
-%   coord=[nº | X] => Matriz de coordenadas dos nós
+%% COORDINATE MATRIX
+%   coord = [number | X-position |  Y-position] 
 
-node = 49; %número incial de nós
-L = 1; %comprimento inicial
+node = 49;             % number of nodes
+L = 1;                 % length
 
-% while conv == 0
-
-coord = zeros(node-1,2);
+coord = zeros(node-1,3);
 
 for i = 1:node
-coord(i,1) = i; %número do nó
-coord(i,2) = L/(node-1)*(i-1); %coordenada x
-coord(i,3) = 0; %coordenada y
+  coord(i,1) = i;                % node number
+  coord(i,2) = L/(node-1)*(i-1); % X-coordinate
+  coord(i,3) = 0; % Y-coordinate
 end
 
 
-%-------Matriz de incidência ---------------------------------------------%
-% inci=[nº | tab.mat | tab.geo | nó1 | nó2 ] => Matriz de
-% incidência do elemento
+%% INCIDENCE MATRIX
+% inci = [number | material | geometry | node-1 | node-2 ]
 
 inci = zeros(node-1,5); 
-
 for i = 1:node-1
-inci(i,1) = i; %número do elemento
-inci(i,2) = 1; %material
-inci(i,3) = 1; %geometria
-inci(i,4) = i; %nó 1
-inci(i,5) = i +1; %nó 2
+  inci(i,1) = i;           % node number
+  inci(i,2) = 1;           % material
+  inci(i,3) = 1;           % geometry
+  inci(i,4) = i;           % node-1
+  inci(i,5) = i +1;        % node-2
 end
 
-% ------ Tabela de Materiais ---------------------------------------------%
+%% MATERIALS TABLE
+%  Tmat = [ Material 1 | Material 2 | Material 3 ...]
 %
-%  Tmat[ Material 1 | Material 2 | Material 3 ...]
-%
-%  coluna 1:Mod de elasticidade
-%  coluna 2:Coeficiente de Poisson
+%  column 1: Young's modulus
+%  column 2: Poisson ratio
   
-tabmat=[210E9 0.33];
+tabmat = [210E9 0.33];
 
-% ------ Tabela de Geometria ---------------------------------------------%
+%% GEOMETRY TABLE
+%  Tgeo = [ Geometria 1 | Geometria 2 | Geometria 3 ...]
 %
-%  Tgeo[ Geometria 1 | Geometria 2 | Geometria 3 ...]
-%
-%  coluna 1: Área m²
-%  coluna 2: Densidade kg/m³
+%  column 1: area - square meter
+%  column 2: density - kg/mÂ³
 
 tabgeo = [0.1 7860];
 
-% ------ condições de contorno ---------------------------------------------%
+%% BOUNDARY CONDITIONS
+%   bc = [node | degree of freedom (DF) | value]
 %
-%   bc=[nó | grau de liberdade | valor]
+%   DF 1 --> x
+%   DF 2 --> y
+%   DF 3 --> z
+%   DF 4 --> ox
+%   DF 5 --> oy
+%   DF --> oz
+
+% bc=[];          % Free-Free bar
+bc=[1 1 0];       % Clamped-Free bar
+
+%% EXTERNAL LOAD
+%   F = [node | DF | value]
 %
-%   Grau de liberdade 1 --> x
-%   Grau de liberdade 2 --> y
-%   Grau de liberdade 3 --> z
-%   Grau de liberdade 4 --> ox
-%   Grau de liberdade 5 --> oy
-%   Grau de liberdade 6 --> oz
+%   DF 1 --> Fx
+%   DF 2 --> Fy
+%   DF 3 --> Fz
+%   DF 4 --> Mx
+%   DF 5 --> My
+%   DF 6 --> Mz
 
-% bc=[];
-bc=[1 1 0];
+Load=[];
 
-% ------ carregamentos externos ------------------------------------------%
-%
-%   F=[nó | grau | valor]
-%
-%   Grau de liberdade 1 --> Fx
-%   Grau de liberdade 2 --> Fy
-%   Grau de liberdade 3 --> Fz
-%   Grau de liberdade 4 --> Mx
-%   Grau de liberdade 5 --> My
-%   Grau de liberdade 6 --> Mz
+%   VECTOR SIZES
+nbc = size(bc,1);  % number of boundary conditions
+nF = size(Load,1); % number of external loads
+neq = 0;           % number of equations
+ngdl = 1;          % number of degrees of freedom
 
-    Load=[];
 
-    %------------------Fim dos dados------------------------------------------%
-%   tamanho dos vetores
-
-nbc = size(bc,1); %numero de condições de contorno
-nF = size(Load,1); %numero de forças externas
-neq = 0; %número de equações
-ngdl = 1; %número de graus de liberdade
-
-%%  Montagem das matrizes globais de massa e rigidez 
-
-%cria matriz id, travando inicialmente todos os nós
-%em seguida destrava os graus de liberdade necessários
-
+%%  Assembly of global mass and stiffness matrices
 id=ones(1,node);
 
 for i=1:nbc
@@ -114,10 +99,10 @@ for i= 1:node
     end
 end
 
-kg = zeros(neq,neq); % pré locação da matriz de rigidez global
-mg = zeros(neq,neq); % pré locação da matriz de massa global
+kg = zeros(neq,neq); % pre-allocation of global stiffness matrix
+mg = zeros(neq,neq); % pre-allocation of global mass matrix
 
-for i = 1:node-1 %montagem das matrizes globais de massa e rigidez
+for i = 1:node-1     % matrices assembly
     no1 = inci(i,4);
     no2 = inci(i,5);
     x1 = coord(no1,2);
@@ -128,8 +113,8 @@ for i = 1:node-1 %montagem das matrizes globais de massa e rigidez
     E = tabmat(1,mat);
     a = tabgeo(1);
     rho = tabgeo(2);
-    ke = 1/l*[1 -1; -1 1]; %matriz de rigidez do elemento
-    me = 1*l/6*[2 1;1 2]; %matriz de rigidez do elemento
+    ke = 1/l*[1 -1; -1 1];       % local stiffness matrix
+    me = 1*l/6*[2 1;1 2];        % local mass matrix
     loc = [id(1,no1),id(1,no2)]; 
     for j = 1:2
         if loc(j) ~= 0;
@@ -143,13 +128,13 @@ for i = 1:node-1 %montagem das matrizes globais de massa e rigidez
     end
 end
 
-[theta,D]=eig(kg,mg); %theta = modo de vibração
+[theta,D]=eig(kg,mg); % theta = vibration mode
 
 for i = 1:size(theta,1)
     theta(:,i) = theta(:,i)/max(abs(theta(:,i)));    
 end
 
-lambda = diag(D); %autovalores [K] - lambda*[M] = 0 
+lambda = diag(D); % eigenvalues [K] - lambda*[M] = 0 
 
 poisson = tabmat(2);
 
@@ -157,15 +142,15 @@ G = E/(2*(1+poisson));
  
 b = 1;%sqrt(G/rho);
 
-omega = sqrt(lambda)*b; %frequência de vibração
+omega = sqrt(lambda)*b; % vibration frequency
 
-coord_2 = coord; %coord_2 é a coordenada dos nós após a vibração
+coord_2 = coord; %coord_2 = node coordinate after vibration
 
 y_1 = zeros(node,1);
 
 if isempty(bc)
     
-    for i = 1 : node-1 %primeiro modo de vibração
+    for i = 1 : node-1 % first mode of vibration
         coord_2(i+1,3) = coord_2(i+1,3) + theta(i,2);
         y_1(i+1) = sin((pi*coord_2(i+1,2))/2);
     end
@@ -173,19 +158,19 @@ if isempty(bc)
     figure(1)
     plot(coord_2(:,2),coord_2(:,3),'*-')
     
-    title('Modos de vibração')
-    xlabel('Comprimento da barra sob torção (m)') % x-axis label
-    ylabel('Deslocamento vertical do nó') % x-axis label
+    title('Modos de vibraÃ§Ã£o')
+    xlabel('Comprimento da barra sob torÃ§Ã£o (m)') % x-axis label
+    ylabel('Deslocamento vertical do nÃ³')         % x-axis label
 
     hold on
     
-    coord_2 = coord; %coord_2 é a coordenada dos nós após a vibração
+    coord_2 = coord; 
 
     if node >= 3
 
         y_2 = zeros(node,1);
 
-        for i = 1 : node-1 %segundo modo de vibração
+        for i = 1 : node-1 % second mode of vibration
             coord_2(i+1,3) = coord_2(i+1,3) - theta(i,3);
             y_2(i+1) = sin((3*pi*coord_2(i+1,2))/2);
         end
@@ -194,14 +179,14 @@ if isempty(bc)
 
         plot(coord_2(:,2),coord_2(:,3),'k')
 
-        coord_2 = coord; %coord_2 é a coordenada dos nós após a vibração
+        coord_2 = coord; 
     end
 
     if node >= 4
 
         y_3 = zeros(node,1);
 
-        for i = 1 : node-1 %terceiro modo de vibração
+        for i = 1 : node-1 % third mode of vibration
             coord_2(i+1,3) = coord_2(i+1,3) + theta(i,4);
             y_3(i+1) = sin((5*pi*coord_2(i+1,2))/2);
         end
@@ -212,13 +197,13 @@ if isempty(bc)
 
         legend('Primeiro','Segundo','Terceiro')
 
-        coord_2 = coord; %coord_2 é a coordenada dos nós após a vibração
+        coord_2 = coord; 
 
     end
     
 else
 
-    for i = 1 : node-1 %primeiro modo de vibração
+    for i = 1 : node-1 % first mode of vibration
         coord_2(i+1,3) = coord_2(i+1,3) - theta(i,1);
         y_1(i+1) = sin((pi*coord_2(i+1,2))/2);
     end
@@ -227,23 +212,20 @@ else
 
     figure(1)
     plot(coord_2(:,2),coord_2(:,3),'*-')
-    % hold on
-    % plot(coord_2(:,2),y,'r*')
 
-    title('Modos de vibração')
-    xlabel('Comprimento da barra sob torção (m)') % x-axis label
-    ylabel('Deslocamento vertical do nó') % x-axis label
+    title('VIbration modes')
+    xlabel('Bar length under torsion (m)') % x-axis label
+    ylabel('Vertical node displacement (m)') % y-axis label
 
     hold on
 
-
-    coord_2 = coord; %coord_2 é a coordenada dos nós após a vibração
+    coord_2 = coord; 
 
     if node >= 3
 
         y_2 = zeros(node,1);
 
-        for i = 1 : node-1 %segundo modo de vibração
+        for i = 1 : node-1 % second vibration mode
             coord_2(i+1,3) = coord_2(i+1,3) + theta(i,2);
             y_2(i+1) = sin((3*pi*coord_2(i+1,2))/2);
         end
@@ -252,14 +234,14 @@ else
 
         plot(coord_2(:,2),coord_2(:,3),'k')
 
-        coord_2 = coord; %coord_2 é a coordenada dos nós após a vibração
+        coord_2 = coord; 
     end
 
     if node >= 4
 
         y_3 = zeros(node,1);
 
-        for i = 1 : node-1 %terceiro modo de vibração
+        for i = 1 : node-1 % third vibration mode
             coord_2(i+1,3) = coord_2(i+1,3) - theta(i,3);
             y_3(i+1) = sin((5*pi*coord_2(i+1,2))/2);
         end
@@ -270,14 +252,14 @@ else
 
         legend('Primeiro','Segundo','Terceiro')
 
-        coord_2 = coord; %coord_2 é a coordenada dos nós após a vibração
+        coord_2 = coord;
 
     end
 end
 
-fprintf('\n\n******* Autovalores *******\n')
+fprintf('\n\n******* Eigenvalues *******\n')
 fprintf('       %f\n',lambda)
-fprintf('\n\n******* Frequências de vibração *******\n')
+fprintf('\n\n******* Vibration frequencies *******\n')
 fprintf('       %f\n',omega)
-fprintf('\n\n******* 1º modo de vibração *******\n')
+fprintf('\n\n******* First vibration mode *******\n')
 fprintf('       %f\n',theta(:,1))
