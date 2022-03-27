@@ -1,6 +1,6 @@
-%% Program: Area, Centroid and Moment of Inertia
+%% Program: RAINFALL 
 %
-%   @DESCRIPTION: Define the area of the geometry, its centroid and moment of inertia
+%   @DESCRIPTION: Define the amount of rainfall 
 %   @AUTHOR: Renan Miranda Portela
 %
 %% Clean memory and close windows
