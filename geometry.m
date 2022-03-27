@@ -1,17 +1,15 @@
-%% Program: Área, Centróide e Momento de inércia
+%% Program: Area, Centroid and Moment of Inertia
 %
-%   @DESCRIÇÃO Atividade 5: Definir a área da geometria, seu centróide e
-%   momento de inércia
+%   @DESCRIPTION: Define the area of the geometry, its centroid and moment of inertia
+%   @AUTHOR: Renan Miranda Portela
 %
-%   @AUTOR Renan Miranda Portela @
-%
-%% Limpar memória e fechar janelas
+%% Clean memory and close windows
 clear all
 close all
 clc
 
-%% Matriz de Coordenadas do sistema 
-%   coord=[nº | X | Y] => Matriz de coordenadas dos nós
+%% COORDINATE MATRIX
+%   coord = [number | X-position | Y-position] 
 
 coord = [1 0 33.3;
          2 13.2 62.3;
@@ -28,10 +26,10 @@ coord = [1 0 33.3;
          13 45.0 49.0;
          14 35.0 30.0];
      
-% scatter(coord(:,2),coord(:,3),10,[1 0 0]) %gráfico dos nós
+scatter(coord(:,2),coord(:,3),10,[1 0 0]) % presenting the nodes
      
-%-------Matriz de incidência ---------------------------------------------%
-% inci=[nº | nó1 | nó2 | nó3 | nó4 ] => Matriz de incidência do elemento
+%% INCIDENCE MATRIX
+% inci = [number of the element | node-1 | node-2 | node-3 | node-4 ]
 
 inci = [1 1 4 5 2;
         2 2 5 6 3;
@@ -40,12 +38,10 @@ inci = [1 1 4 5 2;
         5 7 10 9 8;
         6 11 14 13 12];
 
-%------- Matriz pluviométrica ---------%    
-
+%% RAINFALL MATRIX
 u = [4.62 3.81 4.76 5.45 4.90 10.35 4.96 4.26 18.36 15.69];
     
-%------- Matriz de cores ---------%    
-
+%% COLOR MATRIX
 cores = [1 0 0;
          0 1 0;
          0 0 1;
@@ -53,31 +49,30 @@ cores = [1 0 0;
          0 0 0;
          0 1 1];
 
-%% Plot das área dos elemetos
-     
+%% AREA PLOTS     
  for i = 1:size(inci,1)
      x = [coord(inci(i,2),2),coord(inci(i,3),2),coord(inci(i,4),2),coord(inci(i,5),2)];
      y = [coord(inci(i,2),3),coord(inci(i,3),3),coord(inci(i,4),3),coord(inci(i,5),3)];
      patch(x,y,cores(i,:))
  end
-title('Área dos elementos')
-xlabel('distância em km')
-ylabel('distância em km')
+ 
+title('Elements areas')
+xlabel('distance in [km]')
+ylabel('distance in [km]')
 hold on 
 scatter(70,40,30,'*')
 
-%% Área total
+%% TOTAL AREA
+A = 0;            % STARTING SUM
+a_i = zeros(5,1); % ELEMENT AREA VALUE 
 
-A = 0; %área total
-a_i = zeros(5,1);
-
-for i = 1:5 %cálculo da área pela integral do Jacobiano de 4 nós
-    x1 = coord(inci(i,2),2); %coordenadas x dos nós do elemento
+for i = 1:5                  % COMPUTING THE AREA BY THE JACOBIAN 
+    x1 = coord(inci(i,2),2); % X-COORDINATES 
     x2 = coord(inci(i,3),2);
     x3 = coord(inci(i,4),2);
     x4 = coord(inci(i,5),2);
     
-    y1 = coord(inci(i,2),3); %coordenadas y dos nós do elemento
+    y1 = coord(inci(i,2),3); % Y-COORDINATES
     y2 = coord(inci(i,3),3);
     y3 = coord(inci(i,4),3);
     y4 = coord(inci(i,5),3);
@@ -89,14 +84,14 @@ end
 
 A2 = 0;
 
-for i = 1:5 %calculo da área por Quadratura Gaussiana
-    x1 = coord(inci(i,2),2); %coordenadas x dos nós do elemento
+for i = 1:5                  % COMPUTING AREA BY GAUSSIAN QUADRATURE 
+    x1 = coord(inci(i,2),2); % X-COORDINATES
     x2 = coord(inci(i,3),2);
     x3 = coord(inci(i,4),2);
     x4 = coord(inci(i,5),2);
     x = [x1,x2,x3,x4];
     
-    y1 = coord(inci(i,2),3); %coordenadas y dos nós do elemento
+    y1 = coord(inci(i,2),3); % Y-COORDINATES
     y2 = coord(inci(i,3),3);
     y3 = coord(inci(i,4),3);
     y4 = coord(inci(i,5),3);
@@ -128,18 +123,18 @@ for i = 1:5 %calculo da área por Quadratura Gaussiana
     end
 end
 
-%% Chuva total 
+%% TOTAL RAINFALL
  
-Q = 0; %quantidade total de chuva
+Q = 0;           % TOTAL RAINFALL VARIABLE
 g = zeros(5,1);
 
-for i = 1:5 %cálculo da área pela integral do Jacobiano de 4 nós
-    x1 = coord(inci(i,2),2); %coordenadas x dos nós do elemento
+for i = 1:5                  % BY THE JACOBIAN
+    x1 = coord(inci(i,2),2); % X-COORDINATES
     x2 = coord(inci(i,3),2);
     x3 = coord(inci(i,4),2);
     x4 = coord(inci(i,5),2);
         
-    y1 = coord(inci(i,2),3); %coordenadas y dos nós do elemento
+    y1 = coord(inci(i,2),3); % Y-COORDINATES
     y2 = coord(inci(i,3),3);
     y3 = coord(inci(i,4),3);
     y4 = coord(inci(i,5),3);
@@ -154,96 +149,94 @@ for i = 1:5 %cálculo da área pela integral do Jacobiano de 4 nós
     Q = Q + q;
 end
 
-fprintf('\n\n******* Chuva Total *******\n')
+fprintf('\n\n******* TOTAL RAINFALL *******\n')
 fprintf('        %f\n',Q)
 
-%% média pluviométrica
+%% AVERAGE RAINFALL
 
 MQ = Q/A;
 
-fprintf('\n\n******* Média pluviométrica *******\n')
+fprintf('\n\n******* AVERAGE RAINFALL *******\n')
 fprintf('       %f\n',MQ)
 
-%% Interpolação
+%% INTERPOLATION
 
-x=[49.9,59.7,73.9,78.8]; %pontos entorno para interpolação X
-y=[57.6,34.3,36.2,78.2]; %pontos entorno para interpolação Y
+x=[49.9,59.7,73.9,78.8]; % POINTS TO INTERPOLATE AROUND X
+y=[57.6,34.3,36.2,78.2]; % POINTS TO INTERPOLATE AROUND Y
 
-X=70; %pontos de referência
+X=70; % REFERENCE POINT
 Y=40;
-
-[ n ] = NR_search( x,y,X,Y );
 
 U_Ponto_Interpolado = u(5)*n(1)+u(8)*n(2)+u(9)*n(3)+u(6)*n(4);
 
-fprintf('\n\n******* Quantidade de chuva no ponto (70,40) *******\n')
+fprintf('\n\n******* AMOUNT OF RAINFALL AT (70,40) *******\n')
 fprintf('       %f\n',U_Ponto_Interpolado)
 
-%% chuva na região A
+%% RAINFALL IN REGION A
 
 A = zeros(2,4);
 
 for i = 1:4
-    A(1,i) = coord(inci(6,i+1),2); %coordenadas x dos nós do elemento
+    A(1,i) = coord(inci(6,i+1),2); % X-COORDINATES
 end
 
 for j = 1:4
-    A(2,j) = coord(inci(6,j+1),3); %coordenadas y dos nós do elemento
+    A(2,j) = coord(inci(6,j+1),3); % Y-COORDINATES
 end
  
 B = zeros(2,4);
 
 for i = 1:4
-    B(1,i) = coord(inci(1,i+1),2); %coordenadas x dos nós do elemento
+    B(1,i) = coord(inci(1,i+1),2); 
 end
 
 for j = 1:4
-    B(2,j) = coord(inci(1,j+1),3); %coordenadas y dos nós do elemento
+    B(2,j) = coord(inci(1,j+1),3); 
 end
 
 C = zeros(2,4);
 
 for i = 1:4
-    C(1,i) = coord(inci(3,i+1),2); %coordenadas x dos nós do elemento
+    C(1,i) = coord(inci(3,i+1),2); 
 end
 
 for j = 1:4
-    C(2,j) = coord(inci(3,j+1),3); %coordenadas y dos nós do elemento
+    C(2,j) = coord(inci(3,j+1),3); 
 end
 
-x = B(1,:); %região do elemento 1
+x = B(1,:); % ELEMENT 1 REGION
 y = B(2,:);
 
 X = A(1,1);
 Y = A(2,1);
 
-[ n ] = NR_search( x,y,X,Y ); %ponto A_1
+[ n ] = NR_search( x,y,X,Y ); % A1 POINT
 
 U_A1 = u(1)*n(1)+u(4)*n(2)+u(5)*n(3)+u(2)*n(4);
 
 X = A(1,4);
 Y = A(2,4);
 
-[ n ] = NR_search( x,y,X,Y ); %ponto A_4
+[ n ] = NR_search( x,y,X,Y ); % A4 POINT
 
 U_A4 = u(1)*n(1)+u(4)*n(2)+u(5)*n(3)+u(2)*n(4);
 
-x = C(1,:); %região do elemento 3
+x = C(1,:); %regiÃ£o do elemento 3
 y = C(2,:);
 
 X = A(1,2);
 Y = A(2,2);
 
-[ n ] = NR_search( x,y,X,Y ); %ponto A_4
+[ n ] = NR_search( x,y,X,Y ); % A4 POINT
 
-U_A2 = u(4)*n(1)+u(7)*n(2)+u(8)*n(3)+u(5)*n(4); %ponto A_2
+U_A2 = u(4)*n(1)+u(7)*n(2)+u(8)*n(3)+u(5)*n(4); % A2 POINT
 
 X = A(1,3);
 Y = A(2,3);
 
-[ n ] = NR_search( x,y,X,Y ); %ponto A_4
+[ n ] = NR_search( x,y,X,Y ); % A4 POINT
 
-U_A3 = u(4)*n(1)+u(7)*n(2)+u(8)*n(3)+u(5)*n(4); %ponto A_3
+U_A3 = u(4)*n(1)+u(7)*n(2)+u(8)*n(3)+u(5)*n(4); % A3 POINT
 
 x1 = A(1,1); x2 = A(1,2); x3 = A(1,3); x4 = A(1,4);
 y1 = A(2,1); y2 = A(2,2); y3 = A(2,3); y4 = A(2,4);
@@ -254,8 +247,8 @@ Area_A = 0.5*(x1*y2-x2*y1-x1*y4+x2*y3-x3*y2+x4*y1+x3*y4-x4*y3);
 
 MQ_A = Q_A/Area_A;
 
-fprintf('\n\n******* Quantidade total de chuva no elemento A *******\n')
+fprintf('\n\n******* TOTAL AMOUNT OF RAINFALL IN ELEMENT A *******\n')
 fprintf('       %f\n',Q_A)
 
-fprintf('\n\n******* Quantidade média de chuva no elemento A *******\n')
+fprintf('\n\n******* AVERAGE AMOUNT OF RAINFALL IN ELEMENT A *******\n')
 fprintf('       %f\n',MQ_A)
