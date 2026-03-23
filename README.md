@@ -2,46 +2,16 @@
 Codes in Matlab and Python based on Finite Element Methods
 
 
-COde: Euler Critical Load  - (Buckling Analysis of a Two-Element Beam Using Euler-Bernoulli Theory)
+Code: Euler Critical Load  - (Buckling Analysis of a Two-Element Beam Using Euler-Bernoulli Theory)
 
 Description:
-This Python script performs a linear buckling analysis of a 2D beam composed of two Euler-Bernoulli elements with circular hollow cross-sections. It computes the critical buckling load (
-𝑃
-𝑐
-𝑟
-P
-cr
-	​
+This Python script performs a linear buckling analysis of a 2D beam composed of two Euler-Bernoulli elements with circular hollow cross-sections. It computes the critical buckling load (𝑃_cr) using the eigenvalue problem formulation:
 
-) using the eigenvalue problem formulation:
-
-𝐾
-𝑓
-𝑣
-=
-𝜆
-𝐾
-𝑔
-𝑣
-K
-f
-	​
-
-v=λK
-g
-	​
-
-v
+𝐾_𝑓 𝑣 = 𝜆 𝐾_𝑔
 
 where:
 
-𝐾
-𝑓
-K
-f
-	​
-
- is the global stiffness matrix,
+* 𝐾_𝑓  is the global stiffness matrix,
 𝐾
 𝑔
 K
