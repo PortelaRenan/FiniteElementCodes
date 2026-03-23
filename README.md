@@ -5,14 +5,14 @@ Codes in Matlab and Python based on Finite Element Methods
 
 # Buckling Analysis of a Two-Element Beam
 
-This Python script performs a **linear buckling analysis** of a 2D beam composed of two Euler-Bernoulli elements with circular hollow cross-sections. It computes the **critical buckling load** (\(P_{cr}\)) using the **eigenvalue problem** formulation:
+This Python script performs a **linear buckling analysis** of a 2D beam composed of two Euler-Bernoulli elements with circular hollow cross-sections. It computes the **critical buckling load** ($(P_{cr})$) using the **eigenvalue problem** formulation:
 
 $$\mathbf{K_f} \mathbf{v} = \lambda \mathbf{K_g} \mathbf{v}$$
 
 where:  
-- ($'\mathbf{K_f}'$) is the **global stiffness matrix**,  
-- ($'\mathbf{K_g}'$) is the **global geometric stiffness matrix**,  
-- ($'\lambda'$) are the **eigenvalues**, the smallest of which corresponds to the **critical buckling load**.  
+- ($\mathbf{K_f}$) is the **global stiffness matrix**,  
+- ($\mathbf{K_g}$) is the **global geometric stiffness matrix**,  
+- ($\lambda$) are the **eigenvalues**, the smallest of which corresponds to the **critical buckling load**.  
 
 The code allows for varying material and geometric properties along elements, and applies boundary conditions by masking fixed degrees of freedom.
 
@@ -40,4 +40,4 @@ The code allows for varying material and geometric properties along elements, an
 Run the script using Python:
 
 bash
-python beam_buckling.py
+python euler_critical_load.py
