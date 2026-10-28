@@ -5,7 +5,7 @@ sys.path.append(str(Path(__file__).resolve().parent.parent))
 
 import numpy as np
 import matplotlib.pyplot as plt
-from FEA_functions import TimoshenkoBeam
+from fem.elements.beam import TimoshenkoBeam
 
 E = 207e9   # modulus of elasticity
 G =  80e9   # shear modulus

@@ -5,7 +5,7 @@ sys.path.append(str(Path(__file__).resolve().parent.parent))
 
 import numpy as np
 import matplotlib.pyplot as plt
-from FEA_functions import BernoulliBeam
+from fem.elements.beam import BernoulliBeam
 
 E = 210e9   # modulus od elasticity
 I = 4e-4    # second moment of area
