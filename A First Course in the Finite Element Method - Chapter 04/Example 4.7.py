@@ -1,0 +1,83 @@
+import sys
+from pathlib import Path
+
+sys.path.append(str(Path(__file__).resolve().parent.parent))
+
+import numpy as np
+import matplotlib.pyplot as plt
+from FEA_functions import BernoulliBeam
+
+E = 1   # modulus od elasticity
+I = 1    # second moment of area
+
+# coordinates and connectivities
+L = 1
+numberElements = 1
+nodeCoordinates = np.linspace(0,L,numberElements+1)
+numberNodes = np.size(nodeCoordinates)
+elementNodes = [[i, i + 1] for i in range(numberElements)]
+
+# structure
+GDOF = 2*numberNodes 
+displacements = np.zeros(GDOF)
+
+# load 
+P = -1
+F = np.array([-P*L/2, -P*L/8, -P*L/2, P*L/8])
+
+# stiffness
+stiffness = BernoulliBeam(GDOF, elementNodes, nodeCoordinates, E, I)
+
+# boundary conditions
+bc = [0, 1]
+mask = np.arange(GDOF)
+mask = [False if x in bc else True for x in mask]
+
+# solution
+displacements[mask] = np.linalg.solve(stiffness[np.ix_(mask, mask)], 
+                                       F[mask])
+
+np.set_printoptions(precision=4)
+print(f'Displacement = \n{displacements.reshape((-1, 2))} mm')
+
+# reaction
+reaction = np.matmul(stiffness, displacements)
+print(f'Reaction = \n{reaction.reshape((-1, 2))} kN')
+
+nodalForces = F - reaction
+print(f'Correct Nodal Forces = \n{nodalForces.reshape((-1, 2))} kN')
+
+# Post-processing: nodal displacement, shear force and bending moment diagrams
+nodal_forces = reaction.reshape((-1, 2))
+
+fig, (ax1, ax2, ax3) = plt.subplots(3, 1, figsize=(10, 8))
+
+# displacement
+xDis = displacements.reshape((-1, 2))[:,0]
+ax1.plot(nodeCoordinates, xDis, linestyle = '-')
+ax1.axhline(0, color='black', linewidth=0.8)
+ax1.set_xlabel('Beam coordinate, x (m)')
+ax1.set_ylabel('Displacement (m)')
+ax1.set_title('Nodal Displacement')
+ax1.grid(True)
+
+# Shear force: first column of reaction vector
+ax2.plot(nodeCoordinates, nodal_forces[:, 0], 'o-', linewidth=2)
+ax2.fill_between(nodeCoordinates, 0, nodal_forces[:, 0], alpha=0.2)
+ax2.axhline(0, color='black', linewidth=0.8)
+ax2.set_xlabel('Beam coordinate, x (m)')
+ax2.set_ylabel('Shear force (N)')
+ax2.set_title('Nodal Shear Force')
+ax2.grid(True)
+
+# Bending moment: second column of reaction vector
+ax3.plot(nodeCoordinates, nodal_forces[:, 1], 'o-', linewidth=2)
+ax3.fill_between(nodeCoordinates, 0, nodal_forces[:, 1], alpha=0.2)
+ax3.axhline(0, color='black', linewidth=0.8)
+ax3.set_xlabel('Beam coordinate, x (m)')
+ax3.set_ylabel('Bending moment (N·m)')
+ax3.set_title('Nodal Bending Moment')
+ax3.grid(True)
+
+plt.tight_layout()
+plt.show()

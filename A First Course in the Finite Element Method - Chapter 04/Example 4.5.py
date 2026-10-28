@@ -59,7 +59,7 @@ ax1.plot(nodeCoordinates, xDis, linestyle = '-')
 ax1.axhline(0, color='black', linewidth=0.8)
 ax1.set_xlabel('Beam coordinate, x (m)')
 ax1.set_ylabel('Displacement (m)')
-ax1.set_title('Nodal Shear Force')
+ax1.set_title('Nodal Displacement')
 ax1.grid(True)
 
 # Shear force: first column of reaction vector
