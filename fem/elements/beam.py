@@ -79,3 +79,63 @@ def TimoshenkoBeam(GDOF: int, elementNodes: list[tuple[int, int]], nodeCoordinat
         stiffness[np.ix_(DOF, DOF)] += localStiffness
 
     return stiffness
+
+def distributedLoad(GDOF: int, elementNodes: list[tuple[int, int]], nodeCoordinates: list[tuple[float, float]], P: float) -> np.ndarray:
+    """
+    Assemble the global load vector for a uniformly distributed load on a beam.
+
+    Parameters:
+        GDOF            : Total number of global degrees of freedom
+        elementNodes    : Connectivity table — each entry is a (node_i, node_j) pair
+                          defining the two nodes of an element
+        nodeCoordinates : Nodal coordinates — each entry is an x coordinate value
+        P               : Magnitude of the uniformly distributed load
+
+    Returns:
+        load : np.ndarray, shape (GDOF,)
+            Global equivalent nodal load vector assembled from all element contributions
+    """
+
+    load = np.zeros(GDOF)
+    for element in range(np.size(elementNodes,0)):
+        indices = elementNodes[element]
+        DOF = [2*indices[0], 2*indices[0] + 1, 2*indices[1], 2*indices[1] + 1]    
+
+        length = nodeCoordinates[indices[1]] - nodeCoordinates[indices[0]]
+        
+        localLoad = P*length*np.array([1/2, length/12, 1/2, -length/12])
+
+        load[DOF] += localLoad
+
+    return load
+
+
+def triangularLoad(GDOF: int, elementNodes: list[tuple[int, int]], nodeCoordinates: list[tuple[float, float]], P: float) -> np.ndarray:
+    """
+    Assemble the global load vector for a linearly increasing distributed load on a beam.
+
+    Parameters:
+        GDOF            : Total number of global degrees of freedom
+        elementNodes    : Connectivity table — each entry is a (node_i, node_j) pair
+                          defining the two nodes of an element
+        nodeCoordinates : Nodal coordinates — each entry is an x coordinate value
+        P               : Magnitude of the uniformly distributed load
+
+    Returns:
+        load : np.ndarray, shape (GDOF,)
+            Global equivalent nodal load vector assembled from all element contributions
+    """
+
+    load = np.zeros(GDOF)
+    for element in range(np.size(elementNodes,0)):
+        
+        indices = elementNodes[element]
+        DOF = [2*indices[0], 2*indices[0] + 1, 2*indices[1], 2*indices[1] + 1]    
+
+        length = nodeCoordinates[indices[1]] - nodeCoordinates[indices[0]]
+        
+        localLoad = P*length*np.array([1/2, length/12, 1/2, -length/12])
+
+        load[DOF] += localLoad
+
+    return NotImplemented
