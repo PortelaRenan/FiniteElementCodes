@@ -1,5 +1,11 @@
+import sys
+from pathlib import Path
+
+sys.path.append(str(Path(__file__).resolve().parent.parent))
+
 import os
 import numpy as np
+from gauss import gaussPoints
 
 def shapeFunctionQ4(xi, eta):
     """
@@ -60,3 +66,13 @@ def Bmatrix(xi: float, eta: float, nodeXY: list[tuple[float, float]]):
     B[2, 1::2] = dN_xy[0, :]  # gamma_xy = dv/dx
     
     return B, detJ 
+
+def GradientMatrixQ4(xi: float, eta: float, b: float, h: float)-> np.ndarray:
+
+    B = 1/(4*b*h)*np.array([
+        [-(h - eta), 0, h - eta, 0, h + eta, 0, -(h + eta), 0],
+        [0, -(b - xi), 0, -(b + xi), 0, b + xi, 0, b - xi],
+        [-(b - xi), -(h - eta), -(b + xi), h - eta, b + xi, h + eta, b - xi, -(h + eta)]
+    ])
+    
+    return B

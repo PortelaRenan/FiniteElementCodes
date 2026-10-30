@@ -5,6 +5,11 @@ def planeStress(E, nu):
                                      [nu, 1,  0],
                                      [0,  0, (1 - nu)/2]])
 
+def planeStrain(E, nu):
+    return E/((1 + nu)*(1 - 2*nu)) * np.array([[1 - nu,  nu, 0],
+                                               [nu, 1 - nu,  0],
+                                               [0,  0, (1 - 2*nu)/2]])
+
 def isotropicMaterial(E, thickness, poisson):
     D11 = E*thickness**3/12/(1-poisson**2)
     D22 = D11; 
