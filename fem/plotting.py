@@ -49,3 +49,26 @@ def beamPlot(displacements, reaction, nodeCoordinates: list[tuple[float, float]]
 
     plt.tight_layout()
     plt.show()
+
+def plotTruss(nodeCoordinates, elementNodes, displacements, scale=None):
+    u = displacements.reshape((-1, 2))                # (numberNodes, 2): [ux, uy]
+    deformed = nodeCoordinates + (scale or 1)*u
+
+    fig, ax = plt.subplots(figsize=(6, 6))
+    for n1, n2 in elementNodes:
+        ax.plot(*zip(nodeCoordinates[n1], nodeCoordinates[n2]),
+                'b--', lw=1.5, label='original' if n1 == elementNodes[0][0] and n2 == elementNodes[0][1] else None)
+        ax.plot(*zip(deformed[n1], deformed[n2]),
+                'r-', lw=2, label=f'deformed (x{scale:g})' if (n1, n2) == tuple(elementNodes[0]) else None)
+
+    ax.plot(*nodeCoordinates.T, 'bo')
+    ax.plot(*deformed.T, 'ro')
+    for i, (x, y) in enumerate(nodeCoordinates):
+        ax.annotate(str(i + 1), (x, y), textcoords='offset points', xytext=(6, 6))
+
+    ax.set_aspect('equal')
+    ax.grid(True)
+    ax.set_xlabel('x (m)'); ax.set_ylabel('y (m)')
+    ax.set_title('Truss: original and deformed')
+    ax.legend()
+    plt.show()
