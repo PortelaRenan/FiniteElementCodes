@@ -4,7 +4,7 @@ from pathlib import Path
 sys.path.append(str(Path(__file__).resolve().parent.parent))
 
 import numpy as np
-from fem.elements.cst import GradientMatrix, elementArea, principalStresses
+from fem.elements.cst import GradientMatrix, elementArea
 from fem.constitutiveMatrix import planeStress
 
 # material properties

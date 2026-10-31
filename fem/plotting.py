@@ -3,6 +3,7 @@ import numpy as np
 from datetime import datetime
 import matplotlib.pyplot as plt
 from matplotlib.collections import PolyCollection
+from matplotlib.lines import Line2D
 
 def beamPlot(displacements, reaction, nodeCoordinates: list[tuple[float, float]]) -> None:
     """
@@ -72,3 +73,53 @@ def plotTruss(nodeCoordinates, elementNodes, displacements, scale=None):
     ax.set_title('Truss: original and deformed')
     ax.legend()
     plt.show()
+
+def plotCST(nodeCoordinates, elementNodes, displacements, scale=None,
+            elementValues=None, valueLabel='σ (MPa)', cmap='viridis'):
+    """Original (dashed) and deformed (solid) CST mesh.
+    elementValues : optional (numberElements,) array that shades the deformed elements."""
+    elementNodes = np.asarray(elementNodes)
+    u = displacements.reshape((-1, 2))                       # (numberNodes, 2): [ux, uy]
+
+    if scale is None:                                        # auto: largest displacement = 10 % of plate size
+        size = np.ptp(nodeCoordinates, axis=0).max()
+        scale = 0.1*size/np.abs(u).max()
+    deformed = nodeCoordinates + scale*u
+
+    fig, ax = plt.subplots(figsize=(7, 6))
+
+    # shaded deformed elements (optional)
+    if elementValues is not None:
+        pc = PolyCollection([deformed[e] for e in elementNodes], array=np.asarray(elementValues),
+                            cmap=cmap, edgecolors='none', alpha=0.85)
+        ax.add_collection(pc)
+        fig.colorbar(pc, ax=ax, label=valueLabel, shrink=0.8)
+
+    # element outlines
+    for e in elementNodes:
+        tri = np.append(e, e[0])                             # close the triangle
+        ax.plot(*nodeCoordinates[tri].T, 'b--', lw=1.5)
+        ax.plot(*deformed[tri].T, 'r-', lw=2)
+
+    ax.plot(*nodeCoordinates.T, 'bo')
+    ax.plot(*deformed.T, 'ro')
+    for i, (x, y) in enumerate(nodeCoordinates):
+        ax.annotate(str(i + 1), (x, y), textcoords='offset points', xytext=(6, 6))
+
+    # element numbers at the centroids
+    for i, e in enumerate(elementNodes):
+        cx, cy = nodeCoordinates[e].mean(axis=0)
+        ax.text(cx, cy, f'({i + 1})', ha='center', va='center', fontsize=9,
+                bbox=dict(boxstyle='round,pad=0.15', fc='white', ec='none', alpha=0.7))
+
+    ax.legend(handles=[Line2D([], [], color='b', ls='--', marker='o', label='original'),
+                       Line2D([], [], color='r', ls='-', marker='o', label=f'deformed (x{scale:g})')],
+              loc='upper center', bbox_to_anchor=(0.5, -0.12), ncol=2)
+    ax.autoscale()
+    ax.set_aspect('equal')
+    ax.grid(True)
+    ax.set_xlabel('x (m)'); ax.set_ylabel('y (m)')
+    ax.set_title('CST mesh: original and deformed')
+    plt.tight_layout()
+    plt.show()
+    return fig, ax
