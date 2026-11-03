@@ -51,3 +51,4 @@ def principalStresses(sigma: np.array) -> None:
     vonMises = 1/np.sqrt(2)*( (sigma1 - sigma2)**2 + sigma1**2 + sigma2**2 )**(1/2)
 
     print(f'von Mises stress = {vonMises/1e6:.2f} MPa')
+
