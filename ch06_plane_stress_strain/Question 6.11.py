@@ -16,7 +16,7 @@ nu = 0.30
 # geometry properties
 t = 5e-3 # thickness
 
-""" # ---------- 6.11 (a) ----------
+# ---------- 6.11 (a) ----------
 
 # mesh
 nodeCoordinates = np.array([
@@ -84,7 +84,7 @@ for element in elementNodes:
 
     print(f'\nPrincipal stresses\n')
 
-    principalStresses(sigma) """
+    principalStresses(sigma)
 
 # ---------- 6.14 (b) ----------
 
